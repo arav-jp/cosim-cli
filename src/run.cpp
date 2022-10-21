@@ -7,6 +7,7 @@
 
 #include "cache.hpp"
 #include "run_common.hpp"
+#include "ros_observer.hpp"
 
 #include <cosim/algorithm/fixed_step_algorithm.hpp>
 #include <cosim/execution.hpp>
@@ -131,6 +132,31 @@ std::unique_ptr<cosim::observer> make_file_observer(
     }
 }
 
+std::unique_ptr<cosim::observer> make_ros_observer(
+    const std::string& outputConfigArg,
+    const cosim::filesystem::path& systemStructurePath)
+{
+    if (outputConfigArg == "auto") {
+        const auto systemStructureDir =
+            cosim::filesystem::is_directory(systemStructurePath)
+            ? systemStructurePath
+            : systemStructurePath.parent_path();
+        const auto autoConfigFile = systemStructureDir / "LogConfig.xml";
+        if (cosim::filesystem::exists(autoConfigFile)) {
+            return std::make_unique<cosim::ros_observer>(autoConfigFile);
+        } else {
+            return std::make_unique<cosim::ros_observer>();
+        }
+    } else if (outputConfigArg == "all") {
+        return std::make_unique<cosim::ros_observer>();
+    } else if (outputConfigArg == "none") {
+        return nullptr;
+    } else {
+        return std::make_unique<cosim::ros_observer>(outputConfigArg);
+    }
+}
+
+
 
 void load_scenario(
     cosim::execution& execution,
@@ -227,6 +253,10 @@ int run_subcommand::run(const boost::program_options::variables_map& args) const
             10,
             runOptions.mr_progress_resolution));
 
+    auto rosObserver = make_ros_observer(
+        args["output-config"].as<std::string>(),
+        systemStructurePath);
+    execution.add_observer(std::move(rosObserver));
     execution.simulate_until(runOptions.end_time);
     return 0;
 }

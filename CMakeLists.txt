@@ -72,6 +72,8 @@ add_executable(cosim
     "src/tools.cpp"
     "src/version_option.hpp"
     "src/version_option.cpp"
+    "src/ros_observer.hpp"
+    "src/ros_observer.cpp"
 )
 target_include_directories(cosim PRIVATE "${generatedFilesDir}")
 target_link_libraries(cosim
