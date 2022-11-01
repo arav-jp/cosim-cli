@@ -222,11 +222,15 @@ int run_subcommand::run(const boost::program_options::variables_map& args) const
         cosim::filesystem::path(args["system_structure_path"].as<std::string>());
 
     const auto uriResolver = caching_model_uri_resolver();
+    printf("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
+    std::cout << uriResolver << std::endl;
     auto execution = load_system_structure(
         systemStructurePath,
         *uriResolver,
         runOptions.begin_time,
         runOptions.worker_thread_count);
+
+        
     if (runOptions.rtf_target) {
         auto rtConfig = execution.get_real_time_config();
         rtConfig->real_time_factor_target.store(*runOptions.rtf_target);

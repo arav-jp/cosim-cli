@@ -16,6 +16,8 @@
 #include <boost/log/utility/setup/console.hpp>
 #include <cosim/log/simple.hpp>
 
+#include <ros/ros.h>
+
 
 void setup_logging_sink()
 {
@@ -26,8 +28,10 @@ void setup_logging_sink()
 }
 
 
-int main(int argc, char const* const* argv)
+int main(int argc, char** argv)
 {
+    ros::init(argc, argv, "cosim");
+
     setup_logging_sink();
     cosim::log::set_global_output_level(cosim::log::warning);
 
@@ -41,5 +45,6 @@ int main(int argc, char const* const* argv)
     app.add_subcommand(std::make_unique<inspect_subcommand>());
     app.add_subcommand(std::make_unique<run_subcommand>());
     app.add_subcommand(std::make_unique<run_single_subcommand>());
+
     return app.run(argc, argv);
 }
