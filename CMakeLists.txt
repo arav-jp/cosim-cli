@@ -19,7 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
 # Use the highest warning levels and treat all warnings as errors,
 # but ignore a few selected warnings.
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    add_compile_options("-Wall" "-Wextra" "-Wpedantic" "-Werror" )
+    add_compile_options("-Wall" "-Wextra" "-Wpedantic" "-Werror")
     add_compile_options("-Wno-parentheses")
     add_compile_options("-g" "-O0")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -41,16 +41,16 @@ endif()
 
 include(${CMAKE_BINARY_DIR}/conan.cmake)
 
+#conan_cmake_install(PATH_OR_REFERENCE .
+#                    BUILD missing
+#                    REMOTE conancenter
+#                   SETTINGS ${settings})
 conan_cmake_run(CONANFILE conanfile.txt
                 BASIC_SETUP CMAKE_TARGETS
                 BUILD_TYPE Release
                 BUILD missing)
-#conan_cmake_install(PATH_OR_REFERENCE .
-#                    BUILD missing
-#                    REMOTE conancenter
-#                    SETTINGS ${settings})
 
-add_definitions("-std=c++17")
+#add_definitions("-std=c++17")
 
 if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
     include("${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")
@@ -60,9 +60,7 @@ else()
 endif()
 
 find_package(libcosim REQUIRED)
-find_package(Boost REQUIRED COMPONENTS program_options)
-
-
+find_package(Boost REQUIRED COMPONENTS program_options log thread)
 # ==============================================================================
 # Targets
 # ==============================================================================
@@ -76,6 +74,7 @@ catkin_package(
 
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
 )
 
 set(generatedFilesDir "${CMAKE_BINARY_DIR}/generated")
@@ -114,6 +113,8 @@ target_link_libraries(cosim
     PRIVATE
         libcosim::cosim
         Boost::program_options
+        Boost::log
+        Boost::thread
         ${catkin_LIBRARIES})
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
