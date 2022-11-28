@@ -20,6 +20,9 @@
 #include <unordered_map>
 #include <iostream>
 
+#include <ros/ros.h>
+#include <cosim_msgs/cosim.h>
+
 
 namespace cosim
 {

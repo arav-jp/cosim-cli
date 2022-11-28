@@ -31,6 +31,8 @@ public:
         , timeStampedFileNames_(timeStampedFileNames)
     {
         initialize_default();
+
+        msg_pub = nh.advertise<cosim_msgs::cosim>("cosim_output", 1);
     }
 
     slave_value_writer(observable* observable, size_t decimationFactor,
@@ -40,6 +42,8 @@ public:
         , timeStampedFileNames_(timeStampedFileNames)
     {
         initialize_config(variables);
+
+        msg_pub = nh.advertise<cosim_msgs::cosim>("cosim_output", 1);
     }
 
     void observe(step_number timeStep, time_point currentTime)
@@ -53,11 +57,17 @@ public:
                 if (!boolVars_.empty()) boolSamples_[timeStep].reserve(boolVars_.size());
                 if (!stringVars_.empty()) stringSamples_[timeStep].reserve(stringVars_.size());
 
+                cosim_msgs::cosim cosim_output;
+                cosim_output.header.stamp = ros::Time::now();
+
                 timeSamples_[timeStep] = to_double_time_point(currentTime);
                 std::cout<<"t: "<<timeSamples_[timeStep]<<" ";
                 for (const auto& vd : realVars_) {
                     realSamples_[timeStep].push_back(observable_->get_real(vd.reference));
                     std::cout << vd.name << ": "<<observable_->get_real(vd.reference) << " ";
+
+                    cosim_output.keys.push_back(vd.name);
+                    cosim_output.values.push_back(observable_->get_real(vd.reference));
                 }
                 for (const auto& vd : intVars_) {
                     intSamples_[timeStep].push_back(observable_->get_integer(vd.reference));
@@ -68,9 +78,13 @@ public:
                 for (const auto& vd : stringVars_) {
                     stringSamples_[timeStep].push_back(observable_->get_string(vd.reference));
                 }
+
                 std::cout<<std::endl;
+                msg_pub.publish(cosim_output);
             }
         }
+
+        ros::spinOnce();
     }
 
     void start_recording()
@@ -150,6 +164,10 @@ private:
     std::atomic<bool> recording_ = true;
     std::mutex mutex_;
     bool timeStampedFileNames_ = true;
+
+    ros::NodeHandle nh;
+    //ros publisher
+    ros::Publisher msg_pub;
 };
 
 ros_observer::ros_observer()

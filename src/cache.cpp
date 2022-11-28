@@ -23,8 +23,8 @@ const char* getenv(const char* variableName)
 {
     const auto e = std::getenv(variableName);
     if (e && *e) return e;
-    //BOOST_LOG_SEV(cosim::log::logger(), cosim::log::debug)
-    //    << "Environment variable '" << variableName << "' not set.";
+    BOOST_LOG_SEV(cosim::log::logger(), cosim::log::debug)
+        << "Environment variable '" << variableName << "' not set.";
     return nullptr;
 }
 
@@ -77,13 +77,12 @@ std::shared_ptr<cosim::model_uri_resolver> caching_model_uri_resolver()
 {
     if (const auto cachePath = cache_directory_path()) {
         std::shared_ptr<cosim::persistent_file_cache> cache = std::make_shared<cosim::persistent_file_cache>(*cachePath);
-        //BOOST_LOG_SEV(cosim::log::logger(), cosim::log::info)
-        //    << "Using cache directory: " << *cachePath;
-        printf("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
+        BOOST_LOG_SEV(cosim::log::logger(), cosim::log::info)
+            << "Using cache directory: " << *cachePath;
         return cosim::default_model_uri_resolver(cache);
     } else {
-        //BOOST_LOG_SEV(cosim::log::logger(), cosim::log::warning)
-        //    << "Unable to determine user cache directory; caching is disabled.";
+        BOOST_LOG_SEV(cosim::log::logger(), cosim::log::warning)
+            << "Unable to determine user cache directory; caching is disabled.";
         return cosim::default_model_uri_resolver();
     }
 }

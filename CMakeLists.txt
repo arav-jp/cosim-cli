@@ -10,6 +10,7 @@ set(CMAKE_VERBOSE_MAKEFILE OFF)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  cosim_msgs
 )
 
 # ==============================================================================
@@ -116,6 +117,7 @@ target_link_libraries(cosim
         Boost::log
         Boost::thread
         ${catkin_LIBRARIES})
+add_dependencies(cosim ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # This makes the linker set RPATH rather than RUNPATH for the resulting
